@@ -3,7 +3,7 @@
 **Pil kecil di atas layar Windows.** Musik, lirik live sync, kontrol cepat, dan daftar tugas — muncul saat kamu butuh, menyingkir saat tidak.
 
 🌐 Website: https://khastara7.github.io/islandbar
-⬇️ Download: [IslandBar-Setup.exe (versi terbaru)](https://github.com/khastara7/islandbar/releases/latest/download/IslandBar-Setup.exe)
+⬇️ Download: [IslandBar-Setup.exe (versi terbaru)](https://github.com/khasnantara/islandbar/releases/latest/download/IslandBar-Setup.exe)
 
 ## Fitur
 

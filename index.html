@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IslandBar — notch pintar untuk Windows</title>
+<meta name="description" content="IslandBar: pil kecil di atas layar Windows untuk musik, lirik live sync, kontrol cepat, dan daftar tugas. Gratis untuk Windows 10 dan 11.">
+<meta property="og:title" content="IslandBar — notch pintar untuk Windows">
+<meta property="og:description" content="Musik, lirik live sync, kontrol cepat, dan daftar tugas dalam satu pil kecil di atas layar. Gratis.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b0b0d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0b0d'/%3E%3Crect x='12' y='26' width='40' height='12' rx='6' fill='%23f5f5f7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#30d158;
+  --bg:#0b0b0d; --surface:#141418; --line:#24242a; --line2:#34343b;
+  --text:#f5f5f7; --muted:#a1a1aa; --dim:#8e8e93; --soft:#d1d1d6;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--text)}
+h1,h2{font-family:'Space Grotesk',sans-serif;letter-spacing:-.03em}
+.wrap{max-width:1180px;margin:0 auto;padding-left:24px;padding-right:24px}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:14px 26px;border-radius:999px;font-weight:600;font-size:16px;text-decoration:none;transition:transform .15s,opacity .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--accent);color:#0b0b0d}
+.btn-ghost{border:1px solid var(--line2);color:var(--text)}
+.btn:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* nav */
+header.wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding-top:22px;padding-bottom:22px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo i{width:34px;height:14px;border-radius:999px;background:var(--text);display:inline-block}
+.logo b{font-family:'Space Grotesk',sans-serif;font-size:20px;letter-spacing:-.02em}
+nav{display:flex;flex-wrap:wrap;align-items:center;gap:24px;font-size:15px}
+nav a.link{text-decoration:none;color:#c7c7cc}
+nav a.link:hover{color:var(--text)}
+nav .btn{min-height:44px;padding:10px 18px;font-size:15px}
+
+/* hero */
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px;padding-top:56px;padding-bottom:40px}
+.chip{margin:0;font-size:14px;color:#c7c7cc;border:1px solid #2c2c33;padding:7px 14px;border-radius:999px}
+.hero h1{margin:0;font-weight:700;font-size:clamp(40px,7vw,84px);line-height:1.02;letter-spacing:-.035em;max-width:900px}
+.hero .lead{margin:0;font-size:clamp(17px,2vw,20px);line-height:1.55;color:var(--muted);max-width:640px}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:6px}
+
+/* demo */
+.demo{width:100%;max-width:980px;margin-top:34px;border-radius:22px;border:1px solid #26262c;background:var(--surface);overflow:hidden}
+.screen{position:relative;height:380px;background:#1b1d24;overflow:hidden}
+.blob{position:absolute;border-radius:50%}
+.pill{position:absolute;left:50%;top:0;transform:translateX(-50%);background:#000;color:#fff;transition:opacity .25s}
+.pill[hidden]{display:none}
+.p-idle{width:190px;height:32px;border-radius:0 0 16px 16px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:12px;font-weight:600}
+.p-music{width:320px;height:42px;border-radius:0 0 21px 21px;display:flex;align-items:center;gap:10px;padding:0 14px 0 8px;text-align:left}
+.p-lyric{width:420px;max-width:92%;height:58px;border-radius:0 0 26px 26px;display:flex;align-items:center;gap:10px;padding:0 16px 0 10px}
+.p-panel{width:380px;max-width:94%;background:#0d0d0f;border-radius:0 0 26px 26px;padding:12px 16px 16px;text-align:left}
+.art{border-radius:7px;background:#3a3a44;flex:none;display:flex;align-items:center;justify-content:center}
+.eq{display:flex;align-items:center;gap:3px;height:16px;flex:none}
+.eq span{width:3px;height:14px;border-radius:2px;background:var(--accent);transform-origin:center;animation:eqb .9s ease-in-out infinite}
+.eq span:nth-child(2){animation-delay:.2s}.eq span:nth-child(3){animation-delay:.4s}.eq span:nth-child(4){animation-delay:.1s}
+@keyframes eqb{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.eq span{animation:none}.btn{transition:none}html{scroll-behavior:auto}}
+.modes{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:16px;border-top:1px solid #26262c}
+.modes button{min-height:44px;padding:10px 18px;border-radius:999px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--line2);background:transparent;color:var(--text)}
+.modes button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#0b0b0d}
+.hint{margin:0;font-size:13px;color:var(--dim)}
+
+/* sections */
+section.block{padding-top:80px;padding-bottom:40px}
+.block h2{margin:0 0 12px;font-size:clamp(30px,4vw,48px);line-height:1.08}
+.sub{margin:0 0 40px;font-size:18px;color:var(--muted);max-width:620px;line-height:1.55}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px}
+.card svg{stroke:var(--accent)}
+.card h3{margin:0;font-size:18px;font-weight:600}
+.card p{margin:0;font-size:15px;line-height:1.55;color:var(--muted)}
+
+.custom{display:flex;flex-wrap:wrap;gap:40px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:clamp(24px,4vw,48px)}
+.custom > div{flex:1 1 340px;min-width:0}
+.custom h2{margin:0 0 14px;font-size:clamp(28px,3.6vw,42px);line-height:1.1}
+.custom ul{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:16px;line-height:1.5;color:var(--soft)}
+.preview{display:flex;flex-direction:column;gap:18px;align-items:center}
+.mini{width:220px;height:36px;border-radius:18px;background:#000;border:1px solid #2c2c33;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:13px;font-weight:600}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.swatches button{width:44px;height:44px;border-radius:50%;cursor:pointer;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line2)}
+.swatches button[aria-pressed="true"]{border-color:#fff}
+
+.download{text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px}
+.download h2{margin:0;font-size:clamp(32px,4.6vw,56px);line-height:1.05;letter-spacing:-.035em}
+.download .btn{font-size:17px;min-height:52px;padding:16px 30px;margin-top:6px}
+.note{width:100%;max-width:760px;margin-top:26px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px 26px}
+.note h3{margin:0 0 12px;font-size:17px}
+.note p{margin:0 0 12px;font-size:15px;line-height:1.6;color:var(--muted)}
+.note ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:1.55;color:var(--soft)}
+
+.faq{max-width:860px}
+.faq h2{text-align:center;margin-bottom:28px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-bottom:12px;overflow:hidden}
+summary{list-style:none;cursor:pointer;padding:18px 22px;min-height:56px;display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:16px;font-weight:600}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:22px;color:var(--dim);flex:none}
+details[open] summary::after{content:"−"}
+details p{margin:0;padding:0 22px 20px;font-size:15px;line-height:1.6;color:var(--muted)}
+
+footer{border-top:1px solid #1f1f24;margin-top:40px}
+footer .wrap{padding-top:28px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;font-size:14px;color:var(--dim)}
+footer a{color:#c7c7cc}
+footer small{flex-basis:100%;font-size:12px}
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <a href="#top" class="logo"><i></i><b>IslandBar</b></a>
+  <nav aria-label="Navigasi utama">
+    <a class="link" href="#fitur">Fitur</a>
+    <a class="link" href="#tampilan">Tampilan</a>
+    <a class="link" href="#faq">FAQ</a>
+    <a class="btn btn-primary" href="#download">Download gratis</a>
+  </nav>
+</header>
+
+<main>
+<section id="top" class="wrap hero">
+  <p class="chip">Untuk Windows 10 &amp; 11 · Gratis</p>
+  <h1>Pil kecil di atas layar. Semua yang kamu butuhkan.</h1>
+  <p class="lead">Lagu yang sedang diputar, lirik yang berjalan, kontrol cepat, dan daftar tugas — muncul saat kamu butuh, menyingkir saat tidak.</p>
+  <div class="ctas">
+    <a class="btn btn-primary" href="#download">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+      Download untuk Windows</a>
+    <a class="btn btn-ghost" href="#fitur">Lihat fitur</a>
+  </div>
+
+  <div class="demo">
+    <div class="screen">
+      <div class="blob" aria-hidden="true" style="left:-10%;top:45%;width:70%;height:120%;background:#23324d"></div>
+      <div class="blob" aria-hidden="true" style="right:-15%;top:30%;width:65%;height:120%;background:#2a2440"></div>
+
+      <div class="pill p-idle" data-mode="idle" hidden><span>87%</span><span>Jum, 23</span><span>21.30</span></div>
+
+      <div class="pill p-music" data-mode="music">
+        <div class="art" style="width:28px;height:28px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Judul lagu</div>
+          <div style="font-size:10px;color:var(--muted)">Nama artis</div>
+        </div>
+        <div class="eq" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="pill p-lyric" data-mode="lyric" hidden>
+        <div class="art" style="width:32px;height:32px;border-radius:8px"></div>
+        <div style="flex:1;min-width:0;text-align:center;line-height:1.25">
+          <div style="font-size:10px;color:var(--dim)">baris lirik sebelumnya</div>
+          <div style="font-size:13px;font-weight:600">baris lirik yang sedang dinyanyikan</div>
+          <div style="font-size:10px;color:var(--dim)">baris berikutnya</div>
+        </div>
+        <div class="eq" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="pill p-panel" data-mode="panel" hidden>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600"><span style="color:var(--accent)">87%</span><span>Jum, 23 Okt 21.30</span><span>28°</span></div>
+        <div style="text-align:center;font-size:13px;font-weight:600;margin:10px 0 12px">Sedang Diputar</div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="art" style="width:52px;height:52px;border-radius:12px"></div>
+          <div style="min-width:0"><div style="font-size:14px;font-weight:600">Judul lagu</div><div style="font-size:11px;color:var(--dim)">Nama artis</div></div>
+        </div>
+        <div style="margin-top:14px;height:5px;border-radius:3px;background:#2b2b30"><div style="width:38%;height:5px;border-radius:3px;background:#fff"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:6px"><span>1:24</span><span>-2:13</span></div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:40px;margin-top:8px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="modes" role="group" aria-label="Coba tampilan pil">
+      <button type="button" data-pick="idle" aria-pressed="false">Diam</button>
+      <button type="button" data-pick="music" aria-pressed="true">Musik</button>
+      <button type="button" data-pick="lyric" aria-pressed="false">Lirik</button>
+      <button type="button" data-pick="panel" aria-pressed="false">Panel</button>
+    </div>
+  </div>
+  <p class="hint">Klik tombol di atas untuk melihat tampilan pil yang berbeda.</p>
+</section>
+
+<section id="fitur" class="wrap block">
+  <h2>Fitur yang benar-benar dipakai</h2>
+  <p class="sub">Semua bekerja dari satu pil kecil. Arahkan kursor atau klik untuk membuka panel.</p>
+  <div class="grid">
+    <div class="card"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><h3>Lirik live sync</h3><p>Lirik berjalan mengikuti lagu, langsung di pil atau di panel Sedang Diputar.</p></div>
+    <div class="card"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><h3>Kontrol musik</h3><p>Cover, judul, play/pause, lagu berikutnya, dan lompat ke bagian lagu. Bekerja dengan Spotify dan YouTube di browser.</p></div>
+    <div class="card"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/></svg><h3>Pusat Kontrol</h3><p>WiFi dan ping, paket daya, slider kecerahan dan volume, serta kunci, sleep, restart, dan matikan.</p></div>
+    <div class="card"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 3 3 6-6"/><path d="M16 7h4M16 12h4M5 18h15"/></svg><h3>Daftar tugas</h3><p>Tambah dan centang tugas langsung dari pil. Tersimpan otomatis di laptopmu.</p></div>
+    <div class="card"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M9 8v8M15 8v8"/></svg><h3>Isi pil bisa diatur</h3><p>Pilih yang tampil di kiri, tengah, dan kanan: baterai, jam, tanggal, ping, cuaca, CPU, atau RAM.</p></div>
+    <div class="card"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h3l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg><h3>Popup volume &amp; clipboard</h3><p>Ubah volume atau salin teks, dan pil langsung memberi tahu dengan animasi singkat.</p></div>
+    <div class="card"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3 3 0 0 1 0 6z"/><path d="M9 18l-1 2M13 18l-1 2M17 18l-1 2"/></svg><h3>Cuaca hidup</h3><p>Suhu sesuai lokasimu, plus efek hujan, salju, atau petir di dalam pil.</p></div>
+    <div class="card"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></svg><h3>Ringan &amp; tidak mengganggu</h3><p>Sembunyi otomatis saat nonton atau main game layar penuh, dan bisa ikut menyala bersama Windows.</p></div>
+  </div>
+</section>
+
+<section id="tampilan" class="wrap block">
+  <div class="custom">
+    <div>
+      <h2>Buat jadi milikmu</h2>
+      <p style="margin:0;font-size:17px;line-height:1.6;color:var(--muted)">Atur semuanya dari dalam pil, tanpa membuka file pengaturan.</p>
+      <ul>
+        <li>Tema gelap, terang, atau otomatis</li>
+        <li>8 warna aksen</li>
+        <li>Posisi di atas atau di bawah layar</li>
+        <li>Transparansi solid, kaca, atau bening</li>
+        <li>Animasi cepat, halus, atau memantul</li>
+        <li>Bahasa Indonesia dan English</li>
+      </ul>
+    </div>
+    <div class="preview">
+      <div class="mini"><span style="color:var(--accent)">87%</span><span>Jum, 23</span><span>21.30</span></div>
+      <div class="swatches" role="group" aria-label="Coba warna aksen">
+        <button type="button" aria-label="Hijau" aria-pressed="true" data-color="#30d158" style="background:#30d158"></button>
+        <button type="button" aria-label="Biru" aria-pressed="false" data-color="#0a84ff" style="background:#0a84ff"></button>
+        <button type="button" aria-label="Ungu" aria-pressed="false" data-color="#bf5af2" style="background:#bf5af2"></button>
+        <button type="button" aria-label="Pink" aria-pressed="false" data-color="#ff375f" style="background:#ff375f"></button>
+        <button type="button" aria-label="Oranye" aria-pressed="false" data-color="#ff9f0a" style="background:#ff9f0a"></button>
+        <button type="button" aria-label="Kuning" aria-pressed="false" data-color="#ffd60a" style="background:#ffd60a"></button>
+        <button type="button" aria-label="Mint" aria-pressed="false" data-color="#63e6be" style="background:#63e6be"></button>
+        <button type="button" aria-label="Merah" aria-pressed="false" data-color="#ff453a" style="background:#ff453a"></button>
+      </div>
+      <p class="hint">Klik warna untuk mencoba.</p>
+    </div>
+  </div>
+</section>
+
+<section id="download" class="wrap block download">
+  <h2>Siap dicoba?</h2>
+  <p style="margin:0;font-size:18px;color:var(--muted)">Gratis. Pasang dalam kurang dari satu menit.</p>
+  <!-- GANTI href DI BAWAH dengan link file installer kamu (misalnya dari GitHub Releases) -->
+  <a class="btn btn-primary" href="#download" id="download-link">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+    Download IslandBar untuk Windows</a>
+  <p class="hint" style="font-size:14px">Versi 0.9.0 (Beta) · 40+ MB · Windows 10 (1809+) dan 11, 64-bit</p>
+
+  <div class="note">
+    <h3>Muncul "Windows protected your PC"?</h3>
+    <p>Itu peringatan biasa untuk aplikasi baru yang belum punya tanda tangan digital berbayar.</p>
+    <ol>
+      <li>Klik <strong>More info</strong>.</li>
+      <li>Klik <strong>Run anyway</strong>.</li>
+      <li>Ikuti langkah pemasangan sampai selesai.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="faq" class="wrap block faq">
+  <h2>Pertanyaan umum</h2>
+  <details open><summary>Apakah IslandBar gratis?</summary><p>Ya, gratis untuk dipakai.</p></details>
+  <details><summary>Apakah aman?</summary><p>IslandBar berjalan sepenuhnya di laptopmu. Internet hanya dipakai untuk mengambil lirik lagu dan data cuaca.</p></details>
+  <details><summary>Aplikasi musik apa saja yang didukung?</summary><p>Semua yang tampil di kontrol media Windows, seperti Spotify, YouTube di Chrome atau Edge, dan pemutar musik bawaan Windows.</p></details>
+  <details><summary>Kenapa lirik lagu tertentu tidak muncul?</summary><p>Lirik diambil dari database lirik terbuka. Lagu populer biasanya ada, tapi video dengan judul yang tidak rapi kadang tidak ketemu.</p></details>
+  <details><summary>Apakah slider kecerahan bekerja di monitor eksternal?</summary><p>Slider kecerahan hanya bekerja di layar laptop. Fitur lain tetap berjalan di monitor apa pun.</p></details>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 IslandBar · dibuat oleh jarrr</span>
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <!-- GANTI href dengan link GitHub & kontak kamu -->
+      <a href="#">GitHub</a>
+      <a href="#">Kontak</a>
+    </div>
+    <small>IslandBar adalah proyek independen dan tidak berafiliasi dengan Apple Inc. maupun Microsoft.</small>
+  </div>
+</footer>
+
+<script>
+// demo pil
+const modeBtns = document.querySelectorAll('.modes button');
+modeBtns.forEach(btn => btn.addEventListener('click', () => {
+  const m = btn.dataset.pick;
+  document.querySelectorAll('.pill').forEach(p => p.hidden = p.dataset.mode !== m);
+  modeBtns.forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+}));
+// warna aksen
+const sw = document.querySelectorAll('.swatches button');
+sw.forEach(btn => btn.addEventListener('click', () => {
+  document.documentElement.style.setProperty('--accent', btn.dataset.color);
+  sw.forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+}));
+</script>
+</body>
+</html>
